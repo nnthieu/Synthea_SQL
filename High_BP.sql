@@ -1,4 +1,4 @@
--- cd ./Synthea_data
+-- cd ./SyntheaData
 -- ls
 -- grep -i "systolic blood pressure" *.csv
 -- Now, I know the file observation.csv is the file that I can find hbp patients
