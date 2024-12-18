@@ -1,3 +1,4 @@
+--1. Financial Analysis
 -- Match claims with transactions 
 SELECT c.id, 
        SUM(t.amount) AS total_amount,
@@ -155,6 +156,39 @@ WHERE
     AND TODATE < CURRENT_DATE
 ORDER BY 
     days_overdue DESC; -- Sort by the most overdue claims
+
+--2. operational analysis
+--Service Utilization:Count PLACEOFSERVICE occurrences to see which locations are most commonly used.
+SELECT PLACEOFSERVICE, COUNT(*) AS Occurrences
+FROM claims_transactions
+GROUP BY PLACEOFSERVICE
+ORDER BY Occurrences DESC;
+
+--Analyze PROCEDURECODE frequency to determine popular or costly services.
+SELECT 
+    ct.PROCEDURECODE, 
+    COALESCE(p.description, 'Unknown Procedure') AS description,
+    COUNT(*) AS Frequency, 
+    ROUND(CAST(SUM(ct.AMOUNT) AS NUMERIC), 2) AS TotalCost, 
+    ROUND(CAST(AVG(ct.AMOUNT) AS NUMERIC), 2) AS AverageCost
+FROM 
+    claims_transactions ct
+LEFT JOIN procedures p ON ct.PROCEDURECODE = p.code
+GROUP BY 
+    ct.PROCEDURECODE
+ORDER BY 
+    Frequency DESC;
+
+--Calculate average time between FROMDATE and TODATE to measure claim processing speed.
+SELECT 
+    ROUND(AVG(EXTRACT(EPOCH FROM (TODATE - FROMDATE)) / 86400), 2) AS AvgProcessingTimeDays
+FROM 
+    claims_transactions
+WHERE 
+    TODATE IS NOT NULL AND FROMDATE IS NOT NULL;
+
+
+
 
 
 
